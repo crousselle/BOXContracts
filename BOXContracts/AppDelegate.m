@@ -7,6 +7,13 @@
 //
 
 #import "AppDelegate.h"
+#import "BOXWelcomeViewController.h"
+#import "BOXAuthenticationService.h"
+
+#define BOX_NAVBAR_BACKGROUND_IMAGE_TOP_INSET 41.0f
+#define BOX_NAVBAR_BACKGROUND_IMAGE_LEFT_INSET 20.0f
+#define BOX_NAVBAR_BACKGROUND_IMAGE_BOTTOM_INSET 2.0f
+#define BOX_NAVBAR_BACKGROUND_IMAGE_RIGHT_INSET 19.0f
 
 @implementation AppDelegate
 
@@ -15,6 +22,15 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
+
+    [[BOXAuthenticationService sharedInstance] startService];
+  
+    BOXWelcomeViewController *welcomeViewController = [[BOXWelcomeViewController alloc] init];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:welcomeViewController];
+    UIImage *background = [[UIImage imageNamed:@"bkg-navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(BOX_NAVBAR_BACKGROUND_IMAGE_TOP_INSET, BOX_NAVBAR_BACKGROUND_IMAGE_LEFT_INSET, BOX_NAVBAR_BACKGROUND_IMAGE_BOTTOM_INSET, BOX_NAVBAR_BACKGROUND_IMAGE_RIGHT_INSET)];
+    [[UINavigationBar appearance] setBackgroundImage:background forBarMetrics:UIBarMetricsDefault];
+
+    self.window.rootViewController = navController;
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -43,6 +59,7 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
