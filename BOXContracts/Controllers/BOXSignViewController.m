@@ -79,7 +79,7 @@ static void (^uploadDidProgress)(long long expectedTotalBytes, unsigned long lon
 - (void)saveAction:(id)sender
 {
     UIImage *newImage = [self renderContract];
-    [self saveToCameraRoll:newImage];
+    [self saveToBox:newImage];
 }
 
 - (void)saveToCameraRoll:(UIImage *)image
@@ -95,13 +95,51 @@ static void (^uploadDidProgress)(long long expectedTotalBytes, unsigned long lon
     }];
 }
 
+- (void)saveToBox:(UIImage *)image
+{    
+    BoxItemPickerViewController *folderPicker = [[BoxSDK sharedSDK] 
+                                                 itemPickerWithDelegate:self 
+                                                 selectableObjectType:BOXItemPickerObjectTypeFolder];
+    [self displayController:folderPicker];
+}
+
+
 #pragma mark - BoxFolderPickerDelegate Implementation
 
 - (void)itemPickerController:(BoxItemPickerViewController *)controller 
           didSelectBoxFolder:(BoxFolder *)folder
 {
     [controller dismissViewControllerAnimated:YES completion:^{
+        [self setupAndDisplayUploadOverlay];        
         
+        BoxFilesRequestBuilder *builder = [[BoxFilesRequestBuilder alloc] init];
+        builder.name = self.imageTitle;
+        builder.parentID = folder.modelID;
+        
+        // update slide
+        [[[BoxSDK sharedSDK] filesManager] uploadFileAtPath:self.imagePath 
+                                             requestBuilder:builder 
+                                                    success:^(BoxFile *file) {
+                                                        
+                                                        // Success block is called from networking thread, so dispatch to main thread to update UI
+                                                        dispatch_async(dispatch_get_main_queue(), uploadDidFinish);
+                                                        
+                                                    } 
+                                                    failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, NSDictionary *JSONDictionary) {
+                                                        
+                                                        // Failure block is called from networking thread, so dispatch to main thread to update UI
+                                                        dispatch_async(dispatch_get_main_queue(), uploadDidFail);
+                                                        
+                                                    } 
+                                                   progress:^(unsigned long long totalBytes, unsigned long long bytesSent) {
+                                                       
+                                                       // Progress block is called from networking thread, so dispatch to main thread to update UI
+                                                       dispatch_async(dispatch_get_main_queue(), ^{
+                                                           uploadDidProgress(totalBytes, bytesSent);
+                                                       });
+                                                       
+                                                   }];
+
     }];
 }
 
