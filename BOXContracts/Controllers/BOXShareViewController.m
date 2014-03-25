@@ -46,7 +46,26 @@
 
 - (void)shareAction:(id)sender
 {
+    BoxSharedObjectBuilder *shareObjectBuilder = [[BoxSharedObjectBuilder alloc] init];
+    shareObjectBuilder.canDownload = BoxAPISharedObjectPermissionStateDisabled;
+    shareObjectBuilder.canPreview = BoxAPISharedObjectPermissionStateEnabled;
+    shareObjectBuilder.access = BoxAPISharedObjectAccessOpen;
+    shareObjectBuilder.unsharedAt = self.datePicker.date;
 
+    BoxFilesRequestBuilder *fileBuilder = [[BoxFilesRequestBuilder alloc] init];
+    fileBuilder.sharedLink = shareObjectBuilder;
+
+    [[[BoxSDK sharedSDK] filesManager] createSharedLinkForItem:self.item 
+                                                   withBuilder:fileBuilder 
+                                                       success:^(BoxFile *file) {
+                                                           
+                                                           NSLog(@"%@", file.sharedLink);
+                                                           
+                                                           dispatch_async(dispatch_get_main_queue(), ^{
+                                                               [self dismissViewControllerAnimated:YES completion:nil];
+                                                           });
+                                                           
+                                                       } failure:nil];
 }
 
 

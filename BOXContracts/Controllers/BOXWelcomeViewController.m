@@ -140,6 +140,14 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
     [self.navigationController pushViewController:signViewController animated:YES];
 }
 
+- (void)shareAction:(id)sender
+{
+    self.mode = BOXWelcomeScreenModeShare;
+    
+    UIViewController *picker = [self boxContractPicker];
+    [self displayController:picker];
+}
+
 
 #pragma mark - BOXSignViewControllerDelegate Implementation
 
@@ -186,6 +194,10 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
         
         if (self.mode == BOXWelcomeScreenModeDownload) {
             [self downloadFile:file];
+        }
+        else if (self.mode == BOXWelcomeScreenModeShare) {
+            BOXShareViewController *shareController = [[BOXShareViewController alloc] initWithItem:file];
+            [self displayController:shareController];
         }
         
     }];
@@ -333,6 +345,15 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
     [self.view addSubview:self.previewImageView];
     [self.view addSubview:self.titleLabel];
     [self.view addSubview:self.signButton];
+    
+    self.shareButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.shareButton.frame = CGRectMake(0.0f, 0.0f, width - 100.0f, 50.0f);
+    [self.shareButton setBackgroundImage:[[UIImage imageNamed:@"button"] resizableImageWithCapInsets:UIEdgeInsetsMake(5.0, 5.0, 5.0, 5.0)] forState:UIControlStateNormal];
+    self.shareButton.center = CGPointMake(self.signButton.center.x , self.signButton.center.y + 52);
+    self.shareButton.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [self.shareButton setTitle:@"Share a contract" forState:UIControlStateNormal];
+    [self.shareButton addTarget:self action:@selector(shareAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.shareButton];
 }
 
 - (void)displayController:(UIViewController *)controller
