@@ -112,6 +112,16 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
     return _nativeContractPicker;
 }
 
+- (BoxItemPickerViewController *)boxContractPicker
+{
+    if (!_boxContractPicker) {
+        _boxContractPicker = [[BoxSDK sharedSDK] 
+                              itemPickerWithDelegate:self 
+                              selectableObjectType:BOXItemPickerObjectTypeFile];
+    }
+    
+    return _boxContractPicker;
+}
 
 #pragma mark - Selectors
 
@@ -119,8 +129,8 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
 {    
     self.mode = BOXWelcomeScreenModeDownload;
     
-    UIViewController *picker = [self nativeContractPicker];
-    [self presentViewController:picker animated:YES completion:nil];
+    UIViewController *picker = [self boxContractPicker];
+    [self displayController:picker];
 }
 
 - (void)signAction:(id)sender
@@ -167,12 +177,58 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
 }
 
 
+#pragma mark - BoxFolderPickerDelegate Implementation
+
+- (void)itemPickerController:(BoxItemPickerViewController *)controller
+            didSelectBoxFile:(BoxFile *)file
+{
+    [controller dismissViewControllerAnimated:YES completion:^{
+        
+        if (self.mode == BOXWelcomeScreenModeDownload) {
+            [self downloadFile:file];
+        }
+        
+    }];
+}
+
+- (void)itemPickerControllerDidCancel:(BoxItemPickerViewController *)controller
+{
+    [controller dismissViewControllerAnimated:YES completion:nil];
+}
+
+
 
 #pragma mark - Private Helpers
 
 - (void)downloadFile:(BoxFile *)file
 {
+    [self setupAndDisplayDownloadOverlay];
     
+    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentRootPath = [documentPaths objectAtIndex:0];
+    NSString *filePath = [documentRootPath stringByAppendingString:file.modelID];
+    
+    [[[BoxSDK sharedSDK] filesManager] downloadFile:file 
+                                    destinationPath:filePath 
+                                            success:^(NSString *fileID, long long expectedTotalBytes) {
+                                                
+                                                // Success block is called from networking thread, so dispatch to main thread to update UI
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    downloadDidFinish(filePath, file.name);
+                                                });
+                                                
+                                            }failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+                                                
+                                                // Failure block is called from networking thread, so dispatch to main thread to update UI
+                                                dispatch_async(dispatch_get_main_queue(), downloadDidFail);
+                                                
+                                            } progress:^(long long expectedTotalBytes, unsigned long long bytesReceived) {
+                                                
+                                                // Progress block is called from networking thread, so dispatch to main thread to update UI         
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    downloadDidProgress(expectedTotalBytes, bytesReceived);
+                                                });
+                                            }];
 }
 
 

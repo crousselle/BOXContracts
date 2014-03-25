@@ -7,6 +7,6 @@
 //
 #import "BOXSignViewController.h"
 
-@interface BOXWelcomeViewController : UIViewController <BOXSignViewControllerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface BOXWelcomeViewController : UIViewController <BOXItemPickerDelegate, BOXSignViewControllerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @end
