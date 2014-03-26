@@ -12,7 +12,7 @@
 typedef NS_ENUM(NSUInteger, BOXWelcomeScreenMode) {
     BOXWelcomeScreenModeDefault = 0,
     BOXWelcomeScreenModeDownload,
-    BOXWelcomeScreenModeShare,
+    BOXWelcomeScreenModeShare
 };
 
 
@@ -248,7 +248,7 @@ static void (^downloadDidProgress)(long long expectedTotalBytes, unsigned long l
 {
     self.hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     self.hud.mode = MBProgressHUDModeAnnularDeterminate;
-    self.hud.labelText = @"Downloading you file...";
+    self.hud.labelText = @"Downloading your file...";
     self.hud.progress = 0.0;
 }
 

@@ -66,7 +66,7 @@
 
 - (void)setRefreshTokenInKeychain:(NSString *)refreshToken
 {
-    [self.keychain setObject:@"SnapCat-SampleApp" forKey: (__bridge id)kSecAttrService];
+    [self.keychain setObject:@"BOXContracts" forKey: (__bridge id)kSecAttrService];
     [self.keychain setObject:refreshToken forKey:(__bridge id)kSecValueData];
 }
 

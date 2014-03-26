@@ -35,7 +35,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0.0, self.view.frame.size.height - 300, self.view.frame.size.width, 100.0)];
+    self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0.0f, self.view.frame.size.height - 300, self.view.frame.size.width, 100.0)];
     self.datePicker.date = [NSDate date];
     self.datePicker.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     

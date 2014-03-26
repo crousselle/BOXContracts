@@ -38,12 +38,12 @@ static void (^uploadDidProgress)(long long expectedTotalBytes, unsigned long lon
         _imageTitle = title;
         
         uploadDidFinish = ^{
-            self.hud.labelText = @"Upload succeeded !";
+            self.hud.labelText = @"Upload Succeeded.";
             [self.hud hide:YES afterDelay:1.5f];
         };
         
         uploadDidFail = ^{
-            self.hud.labelText = @"Upload Failed !";
+            self.hud.labelText = @"Upload Failed.";
             [self.hud hide:YES afterDelay:1.5f];    
         };
         
@@ -171,7 +171,7 @@ static void (^uploadDidProgress)(long long expectedTotalBytes, unsigned long lon
 {
     self.hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     self.hud.mode = MBProgressHUDModeAnnularDeterminate;
-    self.hud.labelText = @"Uploading you file...";
+    self.hud.labelText = @"Uploading your file...";
     self.hud.progress = 0.0f;
 }
 
